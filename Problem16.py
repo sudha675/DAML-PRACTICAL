@@ -1,23 +1,37 @@
-#16:  Conversion of Binary Image to RGB Image
+# Program 16: Hierarchical Clustering
 
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
 
-A = [0,0,1,1,0,0,0,1,0,0,1,0,0,1,1,1,1,0,0,1,0,0,1,0,0,1,0,0,1,0]
-B = [0,1,1,1,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1,0]
+# Load dataset
+iris = pd.read_csv("IRIS.csv")
 
-def bin_to_rgb(array, shape):
-    rgb_array = np.zeros((shape[0], shape[1], 3))
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            if array[i*shape[1]+j] == 1:
-                rgb_array[i,j] = [1,0,0]
-            else:
-                rgb_array[i,j] = [0,1,0]
-    return rgb_array 
+# Select features
+x = iris.iloc[:, :-1].values
+y = iris.iloc[:, -1].values
 
-rgb_A = bin_to_rgb(A, (5,6))
-rgb_A[0,0] = [0,0,1]
-rgb_A[4,5] = [0,0,1]
-plt.imshow(rgb_A)
+# Apply Hierarchical Clustering
+hc = AgglomerativeClustering(n_clusters=3, metric='euclidean', linkage='ward')
+y_hc = hc.fit_predict(x)
+
+# Visualize the clusters
+plt.figure(figsize=(7, 5))
+plt.scatter(x[y_hc == 0, 0], x[y_hc == 0, 1], s=50, c='red', label='Cluster 1')
+plt.scatter(x[y_hc == 1, 0], x[y_hc == 1, 1], s=50, c='green', label='Cluster 2')
+plt.scatter(x[y_hc == 2, 0], x[y_hc == 2, 1], s=50, c='blue', label='Cluster 3')
+
+plt.title('Hierarchical Clustering on IRIS Dataset')
+plt.xlabel('Feature 1 (e.g. Sepal Length)')
+plt.ylabel('Feature 2 (e.g. Sepal Width)')
+plt.legend()
+plt.show()
+
+# Dendrogram
+plt.figure(figsize=(8, 5))
+dendrogram(linkage(x, method='ward'))
+plt.title('Dendrogram for IRIS Dataset')
+plt.xlabel('Samples')
+plt.ylabel('Euclidean Distances')
 plt.show()
